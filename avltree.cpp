@@ -90,38 +90,132 @@ void AVLtree::insert(Node *n, int integer, int decimal)
 void AVLtree::findRotation(Node *n) 
 {   
     if(!n) return;
-    cout<<"left height: "<<getLHeight(n)<<" right height: "<<getRHeight(n)<<endl;
-    if(getLHeight(n) - getRHeight(n) < -k){ //rotateL
-        if(n->right->right){
-            if(n->right->left){
-                rotateL(n);
+    // cout<<"left height: "<<getLHeight(n)<<" right height: "<<getRHeight(n)<<endl;
+    if(fabs(getLHeight(n) - getRHeight(n)) > k){ 
+        Node* p;
+        kdeepestNode(n,p,2); //returns one of nodes at k+1 level
+        if(p->parent){
+            p = p->parent;
+            if((getLHeight(p)-getRHeight(p))>0) //if left is longer
+                p = p->left;
+            else if ((getLHeight(p)-getRHeight(p))<0) //if right is longer
+                p = p->right;
+            
+            if(p->parent->parent == n){
+                if(p->parent == n->left){
+                    if(p == p->parent->left) rotateR(n);
+                    else if(p == p->parent->right) rotateLR(n);
+                }
+                else if (p->parent == n->right){
+                    if(p == p->parent->right) rotateL(n);
+                    else if(p == p->parent->left) rotateRL(n);
+                }
+                
+                
             }
-            else{
-                rotateL(n);
-            }
-            cout<<"Finished rotation\n";
         }
-        else if(n->right->left){
-            rotateRL(n);
-        }
-    }
-    else if(getLHeight(n) - getRHeight(n) > k){ //rotateR
-        if(n->left->left){
-            if(n->left->right){
-                rotateR(n);
-            }
-            else rotateR(n);
-        }
-        else if(n->left->right){
-            rotateLR(n);
-        }
-    }
-    if(n->parent) findRotation(n->parent);
+    }  
+    findRotation(n->parent);
 }
 
-void AVLtree::remove(int integer, int decimal) 
+tuple<int,int> AVLtree::getPredecessor(int integer, int decimal) 
 {
+    Node *n = getNodeFor(integer, decimal, root);
+    if(n == NULL) return make_tuple(-1,-1);
+    if(n->left){
+        n = n->left;
+        while(n->right){
+            n = n->right;
+        } 
+        return n->value;
+    }
+    else{
+        tuple<int,int> current = n->value;
+        while(n->parent){
+            if(get<0>(n->parent->value) == get<0>(current)){
+                if(get<1>(n->parent->value) < get<1>(current)){
+                    return n->parent->value;
+                }
+                else n = n->parent;
+            }
+            if(get<0>(n->parent->value) < get<0>(current)) 
+                return n->parent->value;
+            else n = n->parent;
+        }
+        return make_tuple(-1,-1);
+    }
+}
+
+AVLtree::Node* AVLtree::getPredecessorNode(int integer, int decimal) 
+{
+    tuple<int,int> find = getPredecessor(integer, decimal);
+    // cout<<get<0>(find)<<"."<<get<1>(find)<<endl;
+    // int find0 = get<0>(find);
+    // int find1 = get<1>(find);
+    return getNodeFor(get<0>(find),get<1>(find),root);
+    // cout<<get<0>(n->value)<<"."<<get<1>(n->value);
+}
+
+bool AVLtree::remove(int integer, int decimal) 
+{
+    Node* n = getNodeFor(integer,decimal,root);
+
+    if(!n) return false; 
     
+    if(n == root){
+        if(!n->right && !n->left){
+            delete n;
+            root = NULL;
+        }
+        if(n->right && !n->left){
+            root = n->right;
+            delete n;
+        }
+        if(!n->right && n->left){
+            root = n->left;
+            delete n;
+        }
+    }
+
+    if(!n->left && !n->right && n->parent){
+        if(n->parent->left==n)
+            n->parent->left = NULL;
+        else
+            n->parent->right = NULL;
+        findRotation(n->parent);
+        delete n;
+    }
+
+    else if(!n->right && n->parent){
+        if (n->parent->left == n) 
+            n->parent->left = n->left;
+        else 
+            n->parent->right = n->left;
+        findRotation(n->parent);
+        delete n;
+
+    }
+
+    else if(!n->left && n->parent){
+        if (n->parent->left == n) 
+            n->parent->left = n->right;
+        else 
+            n->parent->right = n->right;
+        findRotation(n->parent);
+        delete n;
+
+    }
+
+    else if(n->left && n->right){
+        Node *temp = getPredecessorNode(integer, decimal);
+        tuple<int,int> test = getPredecessor(integer,decimal);
+        // cout<<"temp: "<<get<0>(temp->value)<<"."<<get<1>(temp->value)<<endl;
+        tuple<int,int> tempVal = make_tuple(get<0>(temp->value), get<1>(temp->value));
+        temp->value = n->value;
+        n->value = tempVal;
+        remove(integer,decimal);
+    }
+    return true;
 }
 
 bool AVLtree::search(int integer, int decimal) 
@@ -148,9 +242,9 @@ void AVLtree::printPreOrder()
 void AVLtree::printInOrder(AVLtree::Node *n) 
 {
     if (!n) return;
-        printInOrder(n->left);
-        cout<<get<0>(n->value)<<"."<<get<1>(n->value)<<" ";
-        printInOrder(n->right);
+    printInOrder(n->left);
+    cout<<get<0>(n->value)<<"."<<get<1>(n->value)<<" ";
+    printInOrder(n->right);
 }
 
 void AVLtree::printPreOrder(AVLtree::Node *n) 
@@ -165,7 +259,7 @@ void AVLtree::printPreOrder(AVLtree::Node *n)
 AVLtree::Node* AVLtree::getNodeFor(int integer, int decimal, Node* n)
 {
     if(n){
-        if(get<0>(n->value)==integer || get<1>(n->value)==decimal)
+        if(get<0>(n->value)==integer && get<1>(n->value)==decimal)
             return n;
         else{
             Node *p = getNodeFor(integer, decimal, n->left);
@@ -176,179 +270,111 @@ AVLtree::Node* AVLtree::getNodeFor(int integer, int decimal, Node* n)
     return NULL;
 }
 
-void AVLtree::rotate(Node *n) 
-{
-    if(!n) return;
-    if(!n->parent) return;
-    if(!n->parent->parent) return;
-    if ((n == n->parent->right) && (n->parent->left)
-        && (n->parent == n->parent->parent->right) 
-        && (n->parent->parent->left)) //rotateL case
-        rotateL(n);
-    else if ((n == n->parent->left) && (n->parent->right == NULL)
-        && (n->parent == n->parent->parent->left)
-        && (n->parent->parent->right == NULL)) //rotateR case
-        rotateR(n);
-    else if ((n == n->parent->right) && (n->parent->left == NULL)
-        && (n->parent == n->parent->parent->left)
-        && (n->parent->parent->right == NULL)) //rotateLR
-        rotateLR(n);
-    else if ((n == n->parent->left) && (n->parent->right == NULL)
-        && (n->parent == n->parent->parent->right)
-        && (n->parent->parent->left == NULL)) //rotateRL
-        rotateRL(n);
-
-}
-
-// void AVLtree::rotateL(Node *c) 
-// {
-//     Node* b = c->parent;
-//     Node* a = b->parent;
-//     if (a->parent)
-//         a->parent->right = b;
-//     if(b->left)
-//         a->right = b->left;
-//     else a->right = NULL;
-//     b->parent = a->parent;
-//     a->parent = b;
-//     b->left = a;
-
-//     if (a == root){
-//         root = b;
-//     }
-//     // a->depth += 1;
-//     // b->depth -= 1;
-//     // c->depth -= 1;
-// }
-
-// void AVLtree::rotateR(Node *a) 
-// {
-//     cout<<"rotateR\n";
-//     Node* b = a->parent;
-//     // cout<<"here";
-//     Node* c = b->parent;
-//     // cout<<"here";
-//     if( c->parent)
-//         c->parent->left = b;
-//     if(b->right)
-//         c->left = b->right;
-//     b->parent = c->parent;
-//     c->parent = b;
-//     b->right = c;
-//     c->left = NULL;
-//     if (c == root){
-//         root = b;
-//     }
-//     // c->depth++;
-//     // b->depth--;
-//     // a->depth--;
-// }
-
-// void AVLtree::rotateLR(Node *b) 
-// {
-//     cout<<"rotateLR\n";
-//     Node* a = b->parent;
-//     Node* c = a->parent;
-//     // c->left = b;
-//     // b->left = a;
-//     // b->parent = c;
-//     // a->parent = b;
-//     // a->right = NULL;
-//     b->parent = c;
-//     c->left = b;
-//     a->parent = b;
-//     a->right = NULL;
-//     b->left = a;
-//     rotateR(a);
-//     // cout<<"finish\n";
-//     // b->depth--;
-//     // a->depth++;
-//     // rotateR(a);
-// }
-
-// void AVLtree::rotateRL(Node *b) 
-// {
-//     cout<<"rotateRL\n";
-//     Node* c = b->parent;
-//     Node* a = c->parent;
-//     b->parent = a;
-//     a->right = b;
-//     c->parent = b;
-//     b->right = c;
-//     c->left = NULL;
-//     // a->left = b->left = b->right =c->right = NULL;
-//     // b->left = a;
-//     // b->right = c;
-//     // a->parent = b;
-//     // c->parent = b;
-//     // if(c==root)
-//     //     root = b;
-//     rotateL(c);
-// }
-
 void AVLtree::rotateL(Node *n){
-    cout<<"rotateL\n";
+    // cout<<"rotateL\n";
     Node *p = n->right;
-    Node *q = p->right;
+
+    // cout<<"was:\n n: "<<get<0>(n->value)<<" p: "<<get<0>(p->value)<<endl;
     
-    p->left = n->right;
-    p->parent = n->parent;
-    n->parent = p;
-    p->left = n;
-    p->right = q;
-    q->parent = p;
-
-
-    if(n == root){
+    n->right = p->left;
+    if(p->left)
+        p->left->parent = n;
+    
+    if(n->parent){
+        if(n->parent->left == n){
+            n->parent->left = p;
+            p->parent = n->parent;
+        }
+        else if(n->parent->right == n){
+            n->parent->right = p;
+            p->parent = n->parent;
+        }
+    }
+    else{
+        p->parent = NULL;
         root = p;
     }
-    cout<<"p: "<<get<0>(p->value)<<endl;
-    cout<<"n: "<<get<0>(n->value)<<endl;
-    cout<<"q: "<<get<0>(q->value)<<endl;
-    cout<<"root: "<<get<0>(root->value)<<endl;
-    cout<<"root right: "<<get<0>(root->right->value)<<endl;
-    cout<<"root left: "<<get<0>(root->left->value)<<endl;
-    cout<<"finished rotation\n";
+    n->parent = p;
+    p->left = n;
+
+    // cout<<"now:\n n: "<<get<0>(n->value)<<" p: "<<get<0>(p->value)<<endl;
+    // // cout<<"p left: "<<get<0>(p->left->value)<<endl;
+    // cout<<"root: "<<get<0>(root->value)<<endl;
+    // if(root->left)
+    // cout<<"root left: "<<get<0>(root->left->value)<<endl;
+    // if(root->right)
+    // cout<<"root right: "<<get<0>(root->right->value)<<endl;
+    // cout<<"finished rotation\n";
 }
 
 void AVLtree::rotateRL(Node *n){
-    cout<<"rotateRL\n";
-    Node *p = n->right;
-    Node *q = p->left;
+    // cout<<"rotateRL\n";
+    // Node *p = n->right;
+    // Node *q = p->left;
 
-    n->right = q;
-    q->parent = n;
-    q->right = p;
-    p->parent = q;
-    p->left = NULL;
+    // if(q->left)
+    //     p->left = q->left;
+    // else if(q->right)
+    //     p->left = q->right;
+    // else if(!q->right || !q->left) p->left = NULL;
+    // n->right = q;
+    // q->parent = n;
+    // q->right = p;
+    // p->parent = q;
+    // p->left = NULL;
+    rotateR(n->right);
     rotateL(n);
 }
 
 void AVLtree::rotateR(Node *n){
-    cout<<"rotateR\n";
+    // cout<<"rotateR\n";
     Node *p = n->left;
-    Node *q = p->left;
-
+    // cout<<"was:\n n: "<<get<0>(n->value)<<" p: "<<get<0>(p->value)<<endl;
     n->left = p->right;
-    p->right = n;
-    p->parent = n->parent;
-    n->parent = p;
-    q->parent = n;
+    if(p->right)
+        p->right->parent = n;
 
-    if(n == root && n->parent == p){
+    if(n->parent){
+        if(n->parent->left == n){
+            n->parent->left = p;
+            p->parent = n->parent;
+        }
+        else if(n->parent->right == n){
+            n->parent->right = p;
+            p->parent = n->parent;
+        }
+    }
+    else{
+        p->parent = NULL;
         root = p;
     }
+    n->parent = p;
+    p->right = n;
+
+    // cout<<"now:\n n: "<<get<0>(n->value)<<" p: "<<get<0>(p->value)<<endl;
+    // // cout<<"p left: "<<get<0>(p->left->value)<<endl;
+    // cout<<"root: "<<get<0>(root->value)<<endl;
+    // if(root->left)
+    // cout<<"root left: "<<get<0>(root->left->value)<<endl;
+    // if(root->right)
+    // cout<<"root right: "<<get<0>(root->right->value)<<endl;
+    // cout<<"finished rotation\n";
 }
 
-void AVLtree::rotateLR(Node *n){
-    cout<<"rotateLR\n";
-    Node* p = n->left;
-    Node* q = p->right;
-    n->left = q;
-    q->parent = n;
-    q->left = p;
-    p->parent = q;
-    p->right = NULL;
+void AVLtree::rotateLR(Node *n){ //double rotate right
+    // cout<<"rotateRR\n";
+    // Node* p = n->left;
+    // Node* q = p->right;
+    // if(q->left)
+    //     p->right = q->left;
+    // else if(q->right)
+    //     p->right = q->right;
+    // else if(!q->right || !q->left) p->right = NULL;
+    // n->left = q;
+    // q->parent = n;
+    // q->left = p;
+    // p->parent = q;
+    rotateL(n->left);
     rotateR(n);
 
 }
@@ -396,13 +422,14 @@ void AVLtree::dNHelper(Node* root, int level, int& maxLevel, Node*& deepest)
     }
 }
 
-AVLtree::Node* AVLtree::deepestNode(Node *root, int k) 
+void* AVLtree::kdeepestNode(Node *n, Node*& p, int k) 
 {
-    Node* deepest = root;
-    int maxLevel = -1;
-    dNHelper(root, 0, maxLevel, deepest);
-    // cout<<"deepest value: "<<get<0>(deepest->value);
-    return deepest;
+    if(n){
+        if(n && !k)
+            p = n;
+        kdeepestNode(n->left, p, k-1);
+        kdeepestNode(n->right, p, k-1);
+    }
 }
 
 

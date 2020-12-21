@@ -12,7 +12,7 @@ class AVLtree{
         AVLtree(int k): k(k){}
         ~AVLtree();
         void insert(int integer, int decimal);
-        void remove(int integer, int decimal);
+        bool remove(int integer, int decimal);
         bool search(int integer, int decimal);
         tuple<int,int> approxSearch(int integer, int decimal);
         void printInOrder();
@@ -46,15 +46,17 @@ class AVLtree{
         void rotate(Node *n);
         void rotateL(Node *n);
         void rotateR(Node *n);
-        void rotateLR(Node *n);
         void rotateRL(Node *n);
+        void rotateLR(Node *n);
         int getHeight(Node *n);
         int getLHeight(Node *n);
         int getRHeight(Node *n);
         void dNHelper(Node *root, int level, int& maxLevel, Node*& deepest);
-        Node* deepestNode(Node *root, int k);
+        void* kdeepestNode(Node *root, Node*& p, int k);
         void insert(Node *n, int integer, int decimal);
         void findRotation(Node *n);
+        tuple<int,int> getPredecessor(int integer, int decimal);
+        Node* getPredecessorNode(int integer, int decimal);
 };
 
 #endif // __AVLTREE_H__
