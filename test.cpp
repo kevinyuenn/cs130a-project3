@@ -37,6 +37,17 @@ int main(){
     // test.insert(4,0);
     // test.insert(2,0);
     // test.insert(3,0); //testing rLR
+    test.insert(4,5);
+    test.insert(3,9);
+    test.insert(3,5);
+    test.insert(2,7);
+    test.insert(2,6);
+    test.insert(5,6);
+    test.insert(4,2);
+    test.insert(5,1);
+    test.insert(5,4);
+    test.insert(5,2);
+    test.remove(2,2);
 
     cout<<"inorder: "; 
     test.printInOrder();

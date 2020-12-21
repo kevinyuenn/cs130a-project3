@@ -9,7 +9,7 @@ using namespace std;
 class AVLtree{
     public:
         AVLtree();
-        AVLtree(int k): k(k){}
+        AVLtree(int k): k(k), root(0){}
         ~AVLtree();
         void insert(int integer, int decimal);
         bool remove(int integer, int decimal);
@@ -20,7 +20,7 @@ class AVLtree{
     private:
         struct Node{
             Node(){
-                value = make_tuple(0,0);
+                value = make_tuple(-1,-1);
                 // depth, leftHeight, rightHeight = 0;
                 left = right = parent = NULL;
             }
@@ -39,7 +39,7 @@ class AVLtree{
         };
         void clear(Node *n);
         int k;
-        Node *root;
+        Node *root = NULL;
         void printInOrder(Node *n);
         void printPreOrder(Node *n);
         Node* getNodeFor(int integer, int decimal, Node* n);
@@ -57,6 +57,7 @@ class AVLtree{
         void findRotation(Node *n);
         tuple<int,int> getPredecessor(int integer, int decimal);
         Node* getPredecessorNode(int integer, int decimal);
+        tuple<int,int> minValue(Node* n);
 };
 
 #endif // __AVLTREE_H__

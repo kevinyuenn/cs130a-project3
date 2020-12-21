@@ -9,6 +9,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
+    cout<<argv[1]<<endl;
     string inputs = argv[1];
     vector<string> in;
 
@@ -29,15 +30,16 @@ int main(int argc, char *argv[]){
         }
     }
 
-
+    // int offset = stoi(in[0]);
+    // cout<<offset<<endl;
     AVLtree test(stoi(in[0]));
     int i = 1;
-    //while(i<in.size()){
-
+    int integer, decimal;
     for(int i = 1;i <in.size();i++){
         if(in[i]=="insert"){
             test.insert(stoi(in[i+1]),stoi(in[i+2]));
             i+=2;
+
         }
         else if(in[i]=="search"){
             test.search(stoi(in[i+1]),stoi(in[i+2]));
@@ -57,10 +59,12 @@ int main(int argc, char *argv[]){
         }
         else if(in[i]=="pre_order"){
             test.printPreOrder();
+            cout<<endl;
 
         }
         else if(in[i]=="in_order"){
             test.printInOrder();
+            cout<<endl;
 
         }
         else{
