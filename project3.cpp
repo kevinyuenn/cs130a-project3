@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
     }
 
 
-    Kavl test(stoi(in[0]));
+    AVLtree test(stoi(in[0]));
     int i = 1;
     //while(i<in.size()){
 

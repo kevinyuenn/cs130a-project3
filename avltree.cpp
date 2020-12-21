@@ -220,13 +220,21 @@ bool AVLtree::remove(int integer, int decimal)
 
 bool AVLtree::search(int integer, int decimal) 
 {
-    if (getNodeFor(integer, decimal, root)) return true;
-    return false;
+    if (getNodeFor(integer, decimal, root)) {
+        cout<<integer<<"."<<decimal<<" found\n";
+        return true;
+    }
+    else{
+        cout<<integer<<"."<<decimal<<" not found\n";
+        return false;
+    }
 }
 
 tuple<int,int> AVLtree::approxSearch(int integer, int decimal) 
 {
-    
+    if (getNodeFor(integer,decimal,root)){
+        cout<<"closest to "<<integer<<"."<<decimal<<" is"<< integer<<"."<<decimal<<endl;
+    }
 }
 
 void AVLtree::printInOrder() 
