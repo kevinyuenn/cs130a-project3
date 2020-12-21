@@ -14,7 +14,7 @@ class AVLtree{
         void insert(int integer, int decimal);
         bool remove(int integer, int decimal);
         bool search(int integer, int decimal);
-        tuple<int,int> approxSearch(int integer, int decimal);
+        void approxSearch(int integer, int decimal);
         void printInOrder();
         void printPreOrder();
     private:
@@ -58,6 +58,7 @@ class AVLtree{
         tuple<int,int> getPredecessor(int integer, int decimal);
         Node* getPredecessorNode(int integer, int decimal);
         tuple<int,int> minValue(Node* n);
+        void approxSearchHelper(int integer, int decimal, int* closestInteger, int* closestDecimal, Node* n);
 };
 
 #endif // __AVLTREE_H__

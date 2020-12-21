@@ -47,7 +47,7 @@ int main(int argc, char *argv[]){
 
         }
         else if(in[i]=="approx_search"){
-            test.search(stoi(in[i+1]),stoi(in[i+2]));
+            test.approxSearch(stoi(in[i+1]),stoi(in[i+2]));
             i+=2;
         }
         else if(in[i]=="delete"){
