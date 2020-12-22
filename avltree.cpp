@@ -508,6 +508,7 @@ void* AVLtree::kdeepestNode(Node *n, Node*& p, int k)
         kdeepestNode(n->left, p, k-1);
         kdeepestNode(n->right, p, k-1);
     }
+    return NULL;
 }
 
 

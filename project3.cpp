@@ -9,7 +9,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
-    cout<<argv[1]<<endl;
+    // cout<<argv[1]<<endl;
     string inputs = argv[1];
     vector<string> in;
 
