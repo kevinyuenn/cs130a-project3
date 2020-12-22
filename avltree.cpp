@@ -334,7 +334,6 @@ void AVLtree::printPreOrder()
 
 void AVLtree::printInOrder(AVLtree::Node *n) 
 {
-    if(!root) return;
     if (n){
         printInOrder(n->left);
 
@@ -362,7 +361,6 @@ void AVLtree::printInOrder(AVLtree::Node *n)
 
 void AVLtree::printPreOrder(AVLtree::Node *n) 
 {
-    if(!root) return;
     if (n) {
         if(n==root){
             cout<<get<0>(n->value)<<"."<<get<1>(n->value);
