@@ -11,6 +11,7 @@ class AVLtree{
         AVLtree();
         AVLtree(int k): k(k), root(0){}
         ~AVLtree();
+        bool isRoot();
         void insert(int integer, int decimal);
         bool remove(int integer, int decimal);
         bool search(int integer, int decimal);

@@ -42,7 +42,10 @@ int main(int argc, char *argv[]){
 
         }
         else if(in[i]=="search"){
-            test.search(stoi(in[i+1]),stoi(in[i+2]));
+            if(test.search(stoi(in[i+1]),stoi(in[i+2]))){
+                 cout<<stoi(in[i+1])<<"."<<stoi(in[i+2])<<" found\n";
+            }
+            else{ cout<<stoi(in[i+1])<<"."<<stoi(in[i+2])<<" not found\n";}
             i+=2;
 
         }
@@ -52,20 +55,23 @@ int main(int argc, char *argv[]){
         }
         else if(in[i]=="delete"){
             if(test.remove(stoi(in[i+1]),stoi(in[i+2]))){
-                cout<<in[i+1]<<"."<<in[i+2]<<" deleted"<<endl;
+                cout<<in[i+1]<<"."<<in[i+2]<<" deleted\n";
             }
             i +=2;
 
         }
         else if(in[i]=="pre_order"){
-            test.printPreOrder();
-            cout<<endl;
+            if(test.isRoot()){
+                test.printPreOrder();
+                cout<<endl;
+            }
 
         }
         else if(in[i]=="in_order"){
-            test.printInOrder();
-            cout<<endl;
-
+            if(test.isRoot()){
+                test.printInOrder();
+                cout<<endl;
+            }
         }
         else{
             cout<<in[i]<<" is not recognized"<<endl;

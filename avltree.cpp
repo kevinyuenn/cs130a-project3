@@ -16,6 +16,12 @@ AVLtree::~AVLtree()
     clear(root);
 }
 
+bool AVLtree::isRoot() 
+{
+    if (root) return true;
+    return false;
+}
+
 void AVLtree::clear(AVLtree::Node *n) 
 {
     if (n) {
@@ -257,11 +263,11 @@ bool AVLtree::remove(int integer, int decimal)
 bool AVLtree::search(int integer, int decimal) 
 {
     if (getNodeFor(integer, decimal, root)) {
-        cout<<integer<<"."<<decimal<<" found\n";
+        // cout<<integer<<"."<<decimal<<" found\n";
         return true;
     }
     else{
-        cout<<integer<<"."<<decimal<<" not found\n";
+        // cout<<integer<<"."<<decimal<<" not found\n";
         return false;
     }
 }
@@ -328,6 +334,7 @@ void AVLtree::printPreOrder()
 
 void AVLtree::printInOrder(AVLtree::Node *n) 
 {
+    if(!root) return;
     if (n){
         printInOrder(n->left);
 
@@ -355,6 +362,7 @@ void AVLtree::printInOrder(AVLtree::Node *n)
 
 void AVLtree::printPreOrder(AVLtree::Node *n) 
 {
+    if(!root) return;
     if (n) {
         if(n==root){
             cout<<get<0>(n->value)<<"."<<get<1>(n->value);
